@@ -3,12 +3,7 @@ const VERSION = 'v1.0.0';
 const CACHE_NAME = `${APP_NAME}-${VERSION}`;
 const MAIN_URL = self.registration.scope;
 
-console.log({ MAIN_URL })
-const createUrl = path => {
-  const url = new URL(path, MAIN_URL).href;
-  console.log(url);
-  return url;
-};
+const createUrl = path => `${MAIN_URL}${path}`;
 
 const CACHED_URLS = [
   MAIN_URL,
