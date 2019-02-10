@@ -1,5 +1,5 @@
 const APP_NAME = 'scrum-poker';
-const VERSION = 'v1.0.1';
+const VERSION = 'v1.0.2';
 const CACHE_NAME = `${APP_NAME}-${VERSION}`;
 const MAIN_URL = self.registration.scope;
 
