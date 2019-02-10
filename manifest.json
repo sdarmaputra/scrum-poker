@@ -1,9 +1,9 @@
 {
   "short_name": "Scrum Poker",
   "name": "Scrum Poker",
-  "icons:": [
+  "icons": [
     {
-      "src": "/scrum-poker/images/s-48.png",
+      "src": "images/s-48.png",
       "type": "image/png",
       "sizes": "48x48"
     },
