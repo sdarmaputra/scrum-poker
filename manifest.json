@@ -3,7 +3,7 @@
   "name": "Scrum Poker",
   "icons:": [
     {
-      "src": "./images/s-48.png",
+      "src": "images/s-48.png",
       "type": "image/png",
       "sizes": "48x48"
     },
