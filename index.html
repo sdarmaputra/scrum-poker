@@ -5,10 +5,152 @@
     <meta name="theme-color" content="#BB8FCE">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <link rel="manifest" href="./manifest.json">
+    <style>
+      html, *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      body {
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+        line-height: 1.5em;
+      }
+      button {
+        padding: 14px 28px;
+        background: #BB8FCE;
+        color: #ffffff;
+        text-transform: uppercase;
+        border: none;
+        border-radius: 4px;
+      }
+      .button--block {
+        display: block;
+        width: 100%;
+      }
+      .sticky {
+        position: absolute;
+        bottom: 16px;
+        right: 0;
+        left: 0;
+      }
+      .drawer.is-open::before {
+        content: ' ';
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: #222;
+        opacity: 0.9;
+      }
+      .drawer__inner {
+        position: fixed;
+        top: 100px;
+        bottom:0;
+        width: 100%;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 16px;
+        background-color: #fff;
+        transform: translateY(150%);
+        transition: transform 0.25s ease-in-out;
+      }
+      .drawer__content {
+        position: relative;
+        height: 100%;
+      }
+      .drawer.is-open .drawer__inner {
+        transform: translateY(0);
+      }
+    </style>
     <link rel="shortcut icon" type="image/x-icon" href="./images/favicon.ico">
     <link rel="icon" type="image/png" href="./images/favicon-16x16.png" sizes="16x16" />
     <link rel="icon" type="image/png" href="./images/favicon-32x32.png" sizes="32x32" />
     <link rel="stylesheet" type="text/css" href="./dist/index.css">
+    <script>
+      const updateDrawerId = 'updateDrawer';
+
+      function toggleDrawer(id, show) {
+        const drawer = document.getElementById(id);
+        if (drawer) {
+          drawer.className = show ? 'drawer is-open' : 'drawer';
+        }
+      }
+
+      function attachUpdateDrawer() {
+        const drawer = document.createElement('div');
+        const drawerInner = document.createElement('div');
+        const drawerContent = document.createElement('div');
+        const updateTitle = document.createElement('h3');
+        const updateContent = document.createElement('div');
+        const updateButtonWrapper = document.createElement('div');
+        const updateButton = document.createElement('button');
+
+        drawer.id = updateDrawerId;
+        drawer.className = 'drawer';
+        drawerInner.className = 'drawer__inner';
+        drawerContent.className = 'drawer__content';
+        updateTitle.textContent = 'Yay! App Updated';
+        updateContent.textContent = 'New update already arrived! Your app will be reloaded.';
+        updateButtonWrapper.className = 'sticky';
+        updateButton.className = 'button--block';
+        updateButton.textContent = 'Reload App';
+        updateButton.addEventListener('click', () => {
+          toggleDrawer(updateDrawerId, false)
+          window.location.reload();
+        });
+
+        updateButtonWrapper.append(updateButton);
+
+        drawerContent.append(
+          updateTitle,
+          updateContent,
+          updateButtonWrapper,
+        );
+
+        drawerInner.append(drawerContent);
+        drawer.append(drawerInner);
+
+        document.body.append(drawer);
+      }
+
+      function notifyUpdate(worker) {
+        toggleDrawer(updateDrawerId, true);
+        worker.postMessage('skipWaiting');
+      }
+
+      function trackSwInstallation(worker) {
+        worker.addEventListener('statechange', function() {
+          if (worker.state === 'installed') {
+            notifyUpdate(worker);
+          }
+        });
+      }
+
+      window.onload = function() {
+        attachUpdateDrawer();
+      };
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').then(function(reg) {
+          if (!navigator.serviceWorker.controller) {
+            return;
+          }
+
+          if (reg.waiting) {
+            notifyUpdate(reg.waiting);
+          }
+
+          if (reg.installing) {
+            trackSwInstallation(reg.installing);
+          }
+
+          reg.addEventListener('updatefound', function() {
+            trackSwInstallation(reg.installing);
+          });
+        });
+      }
+    </script>
   </head>
   <body id="app">
   </body>
